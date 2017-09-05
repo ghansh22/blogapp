@@ -7,5 +7,8 @@
     "start": "node app.js"
   },
   "author": "ghanshyam baviskar",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^7.4.3"
+  }
 }

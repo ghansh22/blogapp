@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
 
-
 /* ==================================================
     email validation
 ===================================================*/
@@ -107,7 +106,6 @@ const passwordValidators = [
     }
 ];
 
-
 // user model definition
 const userSchema = new Schema({
     email:{
@@ -128,8 +126,32 @@ const userSchema = new Schema({
         type:String,
         required: true,
         validate: passwordValidators
-    }
+    },
+    activation:{
+        type: Boolean,
+        default: false
+    },
+    randomCode:{
+        type: String,
+        required: true
+    } 
 });
+
+// Schema Middleware to Encrypt Password
+userSchema.pre('save', function(next) {
+  // Ensure password is new or modified before applying encryption
+  if (!this.isModified('password'))
+    return next();
+
+  // Apply encryption
+  bcrypt.hash(this.password, null, null, (err, hash) => {
+    if (err) return next(err); // Ensure no errors
+    this.password = hash; // Apply encryption to password
+    next(); // Exit middleware
+  });
+});
+
+
 
 // exports module
 module.exports = mongoose.model('User', userSchema);
