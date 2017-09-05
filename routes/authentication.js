@@ -177,6 +177,68 @@ register route
       }
     }
   });
+
+  router.get('/checkEmail/:email',(req, res)=>{
+    if(!req.params.email){
+      res.json({
+        success: false,
+        message: 'Email is not provided'
+      });
+    }else{
+      User.findOne({email:req.params.email},(error,user)=>{
+        if(error){
+          res.json({
+            success:false,
+            message: error
+          });
+        }else{
+          if(user){
+            res.json({
+              success: false,
+              message: req.params.email+' is already registered with us. Please login'
+            });
+          }else{
+            res.json({
+              success: true,
+              message: req.params.email+' is available to sign up!'
+            });
+          }
+        }
+      });
+    }
+  });
+
+  router.get('/checkUsername/:username',(req, res)=>{
+    if(!req.params.username){
+      res.json({
+        success: false,
+        message: 'Username is not provided!'
+      });
+    }else{
+      User.findOne({username:req.params.username},(error,user)=>{
+        if(error){
+          res.json({
+            success: false,
+            message: error
+          });
+        }else{
+          if(user){
+            res.json({
+              success: false,
+              message: req.params.username+' is already taken by someone. Please choose another username!'
+            });
+          }else{
+            res.json({
+              success: true,
+              message: req.params.username+' is available!'
+            });
+          }
+        }
+      });
+    }
+  });
+
+
   return router;
 }
 
