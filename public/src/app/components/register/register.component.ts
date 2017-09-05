@@ -19,12 +19,34 @@ export class RegisterComponent implements OnInit {
 
   createForm(){
     this.form = this.formBuilder.group({
-      username: ['',Validators.required],
+      username: ['',Validators.compose([
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(30)
+      ])],
       email: ['',Validators.required],
-      password: ['',Validators.required],
+      password: ['',Validators.compose([
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(35)
+      ])],
       confirmPassword: ['',Validators.required]
-    });
+    }
+    // {
+    //   validator: this.matchingPassword('password','confirm')
+    // });
   }
+
+  // matchingPassword(password, confirm){
+  //   return (group: FormGroup) => {
+  //     if(group.controls[password].value === group.controls[confirm].value){
+  //       return null;
+  //     }else{
+  //       return {'matchingPassword': true}
+  //     }
+  //   }
+  // }
+
 
   onRegisterSubmit(){
     console.log('done');
