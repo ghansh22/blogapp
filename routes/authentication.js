@@ -114,6 +114,66 @@ register route
     }
   });
 
+  router.get('/checkEmail/:email',(req, res)=>{
+    if(!req.params.email){
+      res.json({
+        success: false,
+        message: 'Email is not provided'
+      });
+    }else{
+      User.findOne({email:req.params.email},(error,user)=>{
+        if(error){
+          res.json({
+            success:false,
+            message: error
+          });
+        }else{
+          if(user){
+            res.json({
+              success: false,
+              message: req.params.email+' is already registered with us. Please login'
+            });
+          }else{
+            res.json({
+              success: true,
+              message: req.params.email+' is available to sign up!'
+            });
+          }
+        }
+      });
+    }
+  });
+
+  router.get('/checkUsername/:username',(req, res)=>{
+    if(!req.params.username){
+      res.json({
+        success: false,
+        message: 'Username is not provided!'
+      });
+    }else{
+      User.findOne({username:req.params.username},(error,user)=>{
+        if(error){
+          res.json({
+            success: false,
+            message: error
+          });
+        }else{
+          if(user){
+            res.json({
+              success: false,
+              message: req.params.username+' is already taken by someone. Please choose another username!'
+            });
+          }else{
+            res.json({
+              success: true,
+              message: req.params.username+' is available!'
+            });
+          }
+        }
+      });
+    }
+  });
+
   router.get('/activateUser',(req, res)=>{
     if(!req.query.activatingCode){
       res.json({
@@ -178,67 +238,56 @@ register route
     }
   });
 
-  router.get('/checkEmail/:email',(req, res)=>{
-    if(!req.params.email){
+  router.post('/login',(req, res)=>{
+    if(!req.body.email){
       res.json({
-        success: false,
-        message: 'Email is not provided'
+        success:false,
+        message: 'Email not found!'
       });
     }else{
-      User.findOne({email:req.params.email},(error,user)=>{
-        if(error){
-          res.json({
-            success:false,
-            message: error
-          });
-        }else{
-          if(user){
+      if(!req.body.password){
+        res.json({
+          success:false,
+          message: 'Password not found!'
+        });
+      }else{
+        User.findOne({email:req.body.email},(error,user)=>{
+          if(error){
             res.json({
-              success: false,
-              message: req.params.email+' is already registered with us. Please login'
+              success:false,
+              message: 'Something went wrong!'+error
             });
           }else{
-            res.json({
-              success: true,
-              message: req.params.email+' is available to sign up!'
-            });
+            if(!user){
+              res.json({
+                success:false,
+                message: 'Email is not registered yet! Please register.'
+              });
+            }else{
+          // compare the password
+              const validPassword = user.comparePassword(req.body.password);
+              if(!validPassword){
+                res.json({
+                  success:false,
+                  message: 'You have entered a wrong password!'
+                });
+              }else{
+              // user._id is grabbed from mongodb  
+                const token = jwt.sign({ userId: user._id }, config.secret, {expiresIn: '24h'});
+                res.json({
+                  success:true,
+                  message: 'You have logged in!',
+                  token: token,
+                  user: {username: user.username}
+                });
+              }
+            }
           }
-        }
-      });
+        });
+      }
     }
   });
-
-  router.get('/checkUsername/:username',(req, res)=>{
-    if(!req.params.username){
-      res.json({
-        success: false,
-        message: 'Username is not provided!'
-      });
-    }else{
-      User.findOne({username:req.params.username},(error,user)=>{
-        if(error){
-          res.json({
-            success: false,
-            message: error
-          });
-        }else{
-          if(user){
-            res.json({
-              success: false,
-              message: req.params.username+' is already taken by someone. Please choose another username!'
-            });
-          }else{
-            res.json({
-              success: true,
-              message: req.params.username+' is available!'
-            });
-          }
-        }
-      });
-    }
-  });
-
-
+  
   return router;
 }
 

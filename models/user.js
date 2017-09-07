@@ -151,6 +151,12 @@ userSchema.pre('save', function(next) {
   });
 });
 
+userSchema.methods.comparePassword = function(candidatePassword){
+    return bcrypt.compareSync(candidatePassword, this.password);
+    // this.password is actual password from database
+    // It returns true if password is matched
+}
+
 
 
 // exports module
