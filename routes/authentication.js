@@ -274,6 +274,7 @@ register route
               }else{
               // user._id is grabbed from mongodb  
                 const token = jwt.sign({ userId: user._id }, config.secret, {expiresIn: '24h'});
+              //  setting up token and user with only username               
                 res.json({
                   success:true,
                   message: 'You have logged in!',
@@ -288,6 +289,56 @@ register route
     }
   });
   
+  router.use((req, res, next)=>{
+    const token = req.headers['authorization'];
+    if(!token){
+      res.json({
+        success: false,
+        message: 'No token provided!'
+      });
+    }else{
+      jwt.verify(token, config.secret, function(error,decoded){
+        if(error){
+          res.json({
+            success: false,
+            message: 'Invalid token: '+error
+          });
+        }else{
+          req.decoded = decoded,
+          next();
+        }
+      });
+    }
+  });
+
+  // needs decoded token
+    router.get('/profile',(req, res) => {
+    //   test token first
+        // res.send(req.decoded);
+
+        User.findOne({ _id: req.decoded.userId }).select('username email').exec((err, user) =>{
+            if(err){
+                res.json({
+                    success: false,
+                    message: err
+                });
+            }else{
+                if(!user){
+                    res.json({
+                        success: false,
+                        message: 'No user found.'
+                    })
+                }else{
+                    res.json({
+                        success: true,
+                        user: user
+                    });
+                }
+            }
+        })
+    });
+
+
   return router;
 }
 

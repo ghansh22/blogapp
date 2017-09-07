@@ -11,9 +11,10 @@
   <div class="form-group">
     <label for="email">Email</label>
     <div [ngClass]="{'has-error':form.controls.email.errors && form.controls.email.dirty, 'has-success': !form.controls.email.errors && form.controls.email.dirty  }">
-      <input type="text" name="email" class="form-control" autocomplete="off" placeholder="*email" formControlName='email'>
+      <input type="text" name="email" class="form-control" placeholder="*email" formControlName='email'>
       <ul class="help-block">
         <li *ngIf='form.controls.email.errors?.required && form.controls.email.dirty'>email is required!</li>
+        <li *ngIf='form.controls.email.errors?.validateEmail && form.controls.email.dirty'>Please enter a valid email address.</li>
       </ul>
     </div>
   </div> 

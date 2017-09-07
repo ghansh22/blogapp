@@ -24,7 +24,10 @@ export class LoginComponent implements OnInit {
 
   createForm(){
     this.form = this.formBuilder.group({
-      email: ['',Validators.required],
+      email: ['',Validators.compose([
+        Validators.required,
+        this.validateEmail
+      ])],
       password: ['',Validators.required]
     });
   }
@@ -39,6 +42,15 @@ export class LoginComponent implements OnInit {
     this.form.controls['password'].enable();
   }
   
+  validateEmail(controls){
+    const regExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    if(regExp.test(controls.value)){
+      return null;
+    }else{ 
+      return { 'validateEmail': true }
+    }
+  }
+
   onLoginSubmit(){
     console.log('done');
     this.processing = true;
@@ -57,6 +69,7 @@ export class LoginComponent implements OnInit {
       }else{
         this.messageClass = 'alert alert-success';
         this.message = data.message;
+        this.authService.storeUserData(data.token,data.user);
       }
     });
   }
