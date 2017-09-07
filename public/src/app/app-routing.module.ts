@@ -5,6 +5,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { RegisterComponent } from './components/register/register.component';
 import { LoginComponent } from './components/login/login.component';
 import { ProfileComponent } from './components/profile/profile.component';
+
 //array of 2 routes
 const appRoutes: Routes = [
     {
@@ -28,7 +29,7 @@ const appRoutes: Routes = [
         component: ProfileComponent
     },
     {
-        path: '*',
+        path: '**',
         component: HomeComponent
     }
 ]
