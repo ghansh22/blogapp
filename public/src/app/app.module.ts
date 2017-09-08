@@ -17,6 +17,7 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { AuthService } from './services/auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { NotAuthGuard } from './guards/notAuth.guard';
+import { ActivateUserComponent } from './components/activate-user/activate-user.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { NotAuthGuard } from './guards/notAuth.guard';
     NavbarComponent,
     RegisterComponent,
     LoginComponent,
-    ProfileComponent
+    ProfileComponent,
+    ActivateUserComponent
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,9 +10,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private flashMessagesService: FlashMessagesService
+  ) { }
 
-  ngOnInit() {
-  }
-
+  ngOnInit(
+  ){
+    this.authService.sandBox();
+   }
 }

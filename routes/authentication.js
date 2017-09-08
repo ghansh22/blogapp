@@ -33,7 +33,7 @@ register route
         }else{
           // generate random code 
           let randomCode = generateRandomeCode();
-          console.log(randomCode);
+          console.log('Email activation code: '+randomCode);
 
           let user = new User({
             email: req.body.email,
@@ -43,7 +43,7 @@ register route
           });
 
           // save to database
-          user.save((error)=>{
+          user.save((error,user)=>{
             if(error){
               if(error.code === 11000){
                 console.log('username/email already exixts');
@@ -91,22 +91,23 @@ register route
                 }
               }
             }else{
-              letsMail(req.body.email,randomCode);
+              // letsMail(req.body.email,randomCode);
 
               // generate token
-              // const token = jwt.sign({userId: user._id}, config.secret, {expiresIn: '24h'});
-              // res.json({
-              //   success: true,
-              //   message: 'Token created',
-              //   token: token,
-              //   user: {username: user.username}
-              // });
+              const token = jwt.sign({userId: user._id}, config.secret, {expiresIn: '24h'});
+              res.json({
+                success: true,
+                message: 'Account registered! Please check your email: '+req.body.email+' for activation code!',
+                token: token,
+                user: {username: user.username}
+              });
 
-              console.log('user saved!');
-                res.json({
-                  success: true,
-                  message: 'Account registered! Please check your email: '+req.body.email+' for activation code!'
-                });
+              // console.log('user saved!');
+              //   res.json({
+              //     success: true,
+              //     message: 'Account registered! Please check your email: '+req.body.email+' for activation code!'
+              //   });
+              console.log(user._id);
             }
           });
         }
@@ -174,69 +175,69 @@ register route
     }
   });
 
-  router.get('/activateUser',(req, res)=>{
-    if(!req.query.activatingCode){
-      res.json({
-        success:false,
-        message: 'Please provide activation code.'
-      });
-    }else{
-      if(!req.query.email){
-        res.json({
-          success:false,
-          message: 'email not found.'
-        });
-      }else{
-        User.findOne({email:req.query.email }, (error, user)=>{
-          if(error){
-            res.json({
-              success: false,
-              message: error
-            });
-          }else{
-            if(!user){
-              console.log('user is not found');
-              console.log(user);
-              res.json({
-                success: false,
-                message: 'user is not found'
-              });
-            }else{
-              if(user.activation === true){
-                res.json({
-                  success: false,
-                  message:'Your account is already activated!'
-                })
-              }else{
-                if(req.query.activatingCode !== user.randomCode){
-                  res.json({
-                    success: false,
-                    message: 'Please enter correct activation code.'
-                  });
-                 }else{
-                  User.update({email: req.query.email},{
-                    activation: true
-                  },(error)=>{
-                    if(error){
-                      res.json({
-                        success: false,
-                        message: error
-                      });
-                    }else{
-                      return res.json({
-                        success: true,
-                        message: 'Your account is now activated!'
-                      });
-                    }
-                  });
-                } 
-              }
-            }
-          }
-        });
-      }
-    }
-  });
+  // router.get('/activateUser',(req, res)=>{
+  //   if(!req.query.activatingCode){
+  //     res.json({
+  //       success:false,
+  //       message: 'Please provide activation code.'
+  //     });
+  //   }else{
+  //     if(!req.query.email){
+  //       res.json({
+  //         success:false,
+  //         message: 'email not found.'
+  //       });
+  //     }else{
+  //       User.findOne({email:req.query.email }, (error, user)=>{
+  //         if(error){
+  //           res.json({
+  //             success: false,
+  //             message: error
+  //           });
+  //         }else{
+  //           if(!user){
+  //             console.log('user is not found');
+  //             console.log(user);
+  //             res.json({
+  //               success: false,
+  //               message: 'user is not found'
+  //             });
+  //           }else{
+  //             if(user.activation === true){
+  //               res.json({
+  //                 success: false,
+  //                 message:'Your account is already activated!'
+  //               })
+  //             }else{
+  //               if(req.query.activatingCode !== user.randomCode){
+  //                 res.json({
+  //                   success: false,
+  //                   message: 'Please enter correct activation code.'
+  //                 });
+  //                }else{
+  //                 User.update({email: req.query.email},{
+  //                   activation: true
+  //                 },(error)=>{
+  //                   if(error){
+  //                     res.json({
+  //                       success: false,
+  //                       message: error
+  //                     });
+  //                   }else{
+  //                     return res.json({
+  //                       success: true,
+  //                       message: 'Your account is now activated!'
+  //                     });
+  //                   }
+  //                 });
+  //               } 
+  //             }
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // });
 
   router.post('/login',(req, res)=>{
     if(!req.body.email){
@@ -311,16 +312,107 @@ register route
     }
   });
 
+  router.get('/checkUserActivated',(req, res)=>{
+    // res.send(req.decoded);
+    User.findOne({_id: req.decoded.userId},(error, user)=>{
+      if(error){
+        res.json({
+          success: false,
+          message: 'Something went wrong..'+error
+        });
+      }else{
+        if(!user){
+          res.json({
+            success: false,
+            message: 'user not found!'
+          })
+        }else{
+          if(user.activation !== true){
+            res.json({
+              success: false,
+              message:'user account is not activated!'
+            });
+          }else{
+            res.json({
+              success: true,
+              message:'user account is activated!'
+            });
+          }
+        }
+      }
+    });
+  });
+
+  router.post('/activateUser',(req, res)=>{
+    // res.send(req.decoded);
+    if(!req.body.activationCode){
+      res.json({
+        success:false,
+        message: 'Please provide activation code.'
+      });
+    }else{
+      User.findOne({_id:req.decoded.userId }, (error, user)=>{
+        if(error){
+          res.json({
+            success: false,
+            message: 'Something went wrong..'+error
+          });
+        }else{
+          if(!user){
+            console.log('user is not found');
+            res.json({
+              success: false,
+              message: 'user is not found'
+            });
+          }else{
+            // console.log('User is: '+user);
+            if(user.activation === true){
+              res.json({
+                  success: false,
+                  message:'Your account is already activated!'
+                })
+              }else{
+                // console.log(req.body.activationCode);
+                // console.log(user.randomCode);
+                if(req.body.activationCode !== user.randomCode){
+                  res.json({
+                    success: false,
+                    message: 'Please enter correct activation code.'
+                  });
+                }else{
+                  User.update({_id: req.decoded.userId},{
+                    activation: true
+                  },(error)=>{
+                  if(error){
+                    res.json({
+                      success: false,
+                      message: 'Something went wrong..'+error
+                    });
+                  }else{
+                    return res.json({
+                      success: true,
+                      message: 'Your account is now activated!'
+                    });
+                  }
+                });
+              } 
+            }
+          }
+        }
+      });
+    }
+  });
+
   // needs decoded token
     router.get('/profile',(req, res) => {
     //   test token first
         // res.send(req.decoded);
 
-        User.findOne({ _id: req.decoded.userId }).select('username email').exec((err, user) =>{
-            if(err){
+        User.findOne({ _id: req.decoded.userId }).select('username email activation').exec((error, user) =>{
+            if(error){
                 res.json({
                     success: false,
-                    message: err
+                    message: error
                 });
             }else{
                 if(!user){
