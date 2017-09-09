@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 
 const config = require('./config/database');
 const authentication = require('./routes/authentication')(router);
-
+const blogs = require('./routes/blogs')(router);
 
 // vars
 const app = express();
@@ -39,6 +39,7 @@ app.use(bodyParser.json());
 app.use(express.static(__dirname+'/public/dist'));
 // authentication route
 app.use('/authentication',authentication);
+app.use('/blogs',blogs);
 
 // connect to index html in angular 2
 app.get('*',(req, res)=>{

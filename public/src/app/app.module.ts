@@ -15,9 +15,11 @@ import { LoginComponent } from './components/login/login.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
 import { AuthService } from './services/auth.service';
+import { BlogService } from './services/blog.service';
 import { AuthGuard } from './guards/auth.guard';
 import { NotAuthGuard } from './guards/notAuth.guard';
 import { ActivateUserComponent } from './components/activate-user/activate-user.component';
+import { BlogComponent } from './components/blog/blog.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,8 @@ import { ActivateUserComponent } from './components/activate-user/activate-user.
     RegisterComponent,
     LoginComponent,
     ProfileComponent,
-    ActivateUserComponent
+    ActivateUserComponent,
+    BlogComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +41,7 @@ import { ActivateUserComponent } from './components/activate-user/activate-user.
     AppRoutingModule,
     FlashMessagesModule
   ],
-  providers: [AuthService, AuthGuard, NotAuthGuard],
+  providers: [AuthService, BlogService, AuthGuard, NotAuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -22,7 +22,7 @@
               <a routerLink="/profile">Profile</a>
             </li>
             <li *ngIf="this.authServce.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
-              <a href="#">Blog</a>
+              <a routerLink="/blog">Blog</a>
             </li>
             <li *ngIf="!this.authServce.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
               <a routerLink="/login">Login</a>
