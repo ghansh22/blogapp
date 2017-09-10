@@ -225,5 +225,68 @@ module.exports = (router) =>{
     }
   });
 
+  // router.get('/singleBlog/:id', (req, res) =>{
+  router.delete('/deleteBlog/:id',(req,res)=>{
+    if(!req.params.id){
+      res.json({
+        success: false,
+        message: 'id not found'
+      });
+    }else{
+      Blog.findOne({ _id:req.params.id}, (error, blog)=>{
+        if(error){
+          res.json({
+            success: false,
+            message: error
+          });
+        }else{
+          if(!blog){
+            res.json({
+              success: false,
+              message: 'No blog with such id'
+            });
+          }else{
+            User.findOne( {_id:req.decoded.userId},(error,user)=>{
+              if(error){
+                res.json({
+                  success: false,
+                  message: error
+                });
+              }else{
+                if(!user){
+                  res.json({
+                    success: false,
+                    message: 'Unable to authenticate the user'
+                  });
+                }else{
+                  if( user.username !== blog.createdBy){
+                    res.json({
+                      success: false,
+                      message: 'You are not authenticated to delete this blog!'
+                    });
+                  }else{
+                    blog.remove((error)=>{
+                      if(error){
+                        res.json({
+                          success: false,
+                          message: 'Something went wrong!'+error
+                        });
+                      }else{
+                        res.json({
+                          success: true,
+                          message: 'blog deleted!'
+                        });
+                      }
+                    });
+                  }
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  });
+
   return router;
 };
