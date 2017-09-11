@@ -27,7 +27,7 @@
             <li *ngIf="!this.authServce.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
               <a routerLink="/login">Login</a>
             </li>
-            <li *ngIf="this.authServce.loggedIn()" (click)='onLogoutClick()'>
+            <li *ngIf="this.authServce.loggedIn()" (click)='onLogoutClick()' class="logOut">
               <a >Logout</a>
             </li>
             <li *ngIf="!this.authServce.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">

@@ -10,6 +10,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 })
 export class DashboardComponent implements OnInit {
 
+  username;
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -19,5 +20,10 @@ export class DashboardComponent implements OnInit {
   ngOnInit(
   ){
     this.authService.sandBox();
+    this.authService.getProfile().subscribe(data => {
+      // console.log(data);
+      this.username = data.user.username;
+      // this.status = data.user.activation;
+    });
    }
 }

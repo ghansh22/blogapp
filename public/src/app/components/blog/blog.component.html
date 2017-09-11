@@ -1,4 +1,4 @@
-<h1>Blogs</h1>
+<h3>Blogs posts</h3>
 
 <div class="row show-hide-messages" *ngIf='message'>
   <div [ngClass]='messageClass'>
@@ -25,7 +25,8 @@
     <div class="form-group">
       <label for="body">blog body</label>
       <div [ngClass]="{'has-error': form.controls.body.errors && form.controls.body.dirty, 'has-success': !form.controls.body.errors && form.controls.body.dirty}">
-        <input class="form-control" type="text" name="body" formControlName='body' placeholder="blog body">
+        <!-- <input class="form-control" type="text" name="body" formControlName='body' placeholder="blog body"> -->
+        <textarea rows="" cols="" class="form-control" type="text" name="body" formControlName='body' placeholder="blog body"></textarea>
         <ul class="help-block">
           <li *ngIf='form.controls.body.errors?.required && form.controls.body.dirty'>Please enter body.</li>
           <li *ngIf='form.controls.body.errors?.minlength && form.controls.body.dirty'>Minimum 5 characters required.</li>
@@ -36,14 +37,14 @@
 
     <input [disabled]="!form.valid" type="submit" value="create blog" class="btn btn-block btn-success">
   </form>  
-  
+  <br>
   <a class="btn btn-warning btn-block" (click)='onBack()'>Go back</a>
 </div>
 
   <!-- <p>{{ form.controls.title.value }}</p> -->
 
 
-
+<br>
 <button type="button" name="button" class="btn btn-warning" (click)="newBlogForm()" *ngIf='!newPost'>New Post</button>
 <button [disabled]="loadingBlogs" type="button" name="button" class="btn btn-default" (click)="reloadBlogs()" *ngIf='!newPost'>
   <span class="glyphicon glyphicon-repeat"></span>&nbsp;&nbsp;Reload</button>
@@ -71,18 +72,6 @@
             <span> {{ blog.createdAt | date:'MMM dd, yyyy' }} </span>
           </div>
       </div>
-      <!-- <div class="row">
-          <div id="likes" class="col-md-2">
-          <a href="#">
-              <strong> <span class="glyphicon glyphicon-thumbs-up"></span> like:</strong>
-          </a>
-          </div>
-          <div id="dislikes" class="col-md-2">
-            <a href="#">
-                <span class="glyphicon glyphicon-thumbs-down"></span>    <strong> dislike:</strong>
-            </a>
-          </div>
-      </div> -->
 
      
         
@@ -94,7 +83,6 @@
           <span class="glyphicon glyphicon-thumbs-down"></span>    <strong> dislikes:</strong>{{ blog.dislikes }}
         </div>
           
-        <hr>   
           <a [routerLink]="['/edit-blog',blog._id]">
             <button type="button" class="btn btn-sm btn-info">Edit</button>
           </a>
@@ -107,25 +95,23 @@
         <!--likes dropdown  -->
         <div class="dropdown">
         <button  [disabled]="blog.likedBy.includes(username)" type="button" name="button" class="btn btn-sm btn-success" (click)='likeBlog(blog._id)'>
-          <span class="glyphicon glyphicon-thumbs-up">&nbsp;&nbsp;like: 21</span>
+          <span class="glyphicon glyphicon-thumbs-up">&nbsp;&nbsp;like: {{ blog.likes }}</span>
         </button>
-        <div class="dropdown-content">
-            <a href="#">gugui</a>
-            <a href="#">patel</a>
-            <a href="#">bhrdrwaj</a>
+          <div class="dropdown-content">
+              <!-- <a [routerLink]="['/user/', liker]" *ngFor="let liker of blog.likedBy">{{ liker }}</a> -->
+              <a *ngFor="let liker of blog.likedBy">{{ liker }}</a>
           </div>
         </div>
 
         <!--dislikes dropdown  -->
         <div class="dropdown">
         <button [disabled]="blog.dislikedBy.includes(username)" type="button" name="button" class="btn btn-sm btn-danger" (click)='dislikeBlog(blog._id)'>
-          <span class="glyphicon glyphicon-thumbs-down">&nbsp;&nbsp;disLike: 21</span>
+          <span class="glyphicon glyphicon-thumbs-down">&nbsp;&nbsp;disLike: {{ blog.dislikes }}</span>
         </button>
         <div class="dropdown-content">
-            <a href="#">gugui</a>
-            <a href="#">patel</a>
-            <a href="#">bhrdrwaj</a>
-          </div>
+            <!-- <a [routerLink]="['/user/', disliker]" *ngFor="let disliker of blog.dislikedBy">{{ disliker }}</a> -->
+            <a *ngFor="let disliker of blog.dislikedBy">{{ disliker }}</a>
+        </div>
         </div>
       </div>
       

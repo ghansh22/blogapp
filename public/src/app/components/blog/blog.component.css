@@ -3,6 +3,15 @@
     text-align: justify;
 }
 
+.dropdown-content p{
+    text-align: center;
+}
+
+.panel{
+    margin-top: 15px; 
+}
+
+
 /* Dropdown Button */
 .dropbtn {
     background-color: #4CAF50;

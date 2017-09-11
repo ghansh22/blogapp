@@ -45,6 +45,7 @@ register route
           // save to database
           user.save((error,user)=>{
             if(error){
+        // check whether username or email is available 
               if(error.code === 11000){
                 console.log('username/email already exixts');
                 res.json({
@@ -52,6 +53,7 @@ register route
                   message: 'username/email already exixts'
                 });
               }else{
+       // check for validation errors
                 if(error.errors){
                   if(error.errors.email){
                     console.log(error.errors.email.message);
@@ -91,6 +93,7 @@ register route
                 }
               }
             }else{
+            // send random code to user's email for verification
               // letsMail(req.body.email,randomCode);
 
               // generate token
@@ -101,13 +104,7 @@ register route
                 token: token,
                 user: {username: user.username}
               });
-
-              // console.log('user saved!');
-              //   res.json({
-              //     success: true,
-              //     message: 'Account registered! Please check your email: '+req.body.email+' for activation code!'
-              //   });
-              console.log(user._id);
+              // console.log(user._id);
             }
           });
         }
@@ -115,6 +112,9 @@ register route
     }
   });
 
+/*===================================================
+check email availability for validation
+===================================================*/
   router.get('/checkEmail/:email',(req, res)=>{
     if(!req.params.email){
       res.json({
@@ -145,6 +145,9 @@ register route
     }
   });
 
+/*===================================================
+check username availability for validation
+===================================================*/
   router.get('/checkUsername/:username',(req, res)=>{
     if(!req.params.username){
       res.json({
@@ -175,70 +178,9 @@ register route
     }
   });
 
-  // router.get('/activateUser',(req, res)=>{
-  //   if(!req.query.activatingCode){
-  //     res.json({
-  //       success:false,
-  //       message: 'Please provide activation code.'
-  //     });
-  //   }else{
-  //     if(!req.query.email){
-  //       res.json({
-  //         success:false,
-  //         message: 'email not found.'
-  //       });
-  //     }else{
-  //       User.findOne({email:req.query.email }, (error, user)=>{
-  //         if(error){
-  //           res.json({
-  //             success: false,
-  //             message: error
-  //           });
-  //         }else{
-  //           if(!user){
-  //             console.log('user is not found');
-  //             console.log(user);
-  //             res.json({
-  //               success: false,
-  //               message: 'user is not found'
-  //             });
-  //           }else{
-  //             if(user.activation === true){
-  //               res.json({
-  //                 success: false,
-  //                 message:'Your account is already activated!'
-  //               })
-  //             }else{
-  //               if(req.query.activatingCode !== user.randomCode){
-  //                 res.json({
-  //                   success: false,
-  //                   message: 'Please enter correct activation code.'
-  //                 });
-  //                }else{
-  //                 User.update({email: req.query.email},{
-  //                   activation: true
-  //                 },(error)=>{
-  //                   if(error){
-  //                     res.json({
-  //                       success: false,
-  //                       message: error
-  //                     });
-  //                   }else{
-  //                     return res.json({
-  //                       success: true,
-  //                       message: 'Your account is now activated!'
-  //                     });
-  //                   }
-  //                 });
-  //               } 
-  //             }
-  //           }
-  //         }
-  //       });
-  //     }
-  //   }
-  // });
-
+/*===================================================
+login route
+===================================================*/
   router.post('/login',(req, res)=>{
     if(!req.body.email){
       res.json({
@@ -273,9 +215,9 @@ register route
                   message: 'You have entered a wrong password!'
                 });
               }else{
-              // user._id is grabbed from mongodb  
+              // user._id is grabbed from mongodb and making available userId to use in code  
                 const token = jwt.sign({ userId: user._id }, config.secret, {expiresIn: '24h'});
-              //  setting up token and user with only username               
+              //  setting up token response and user with only username               
                 res.json({
                   success:true,
                   message: 'You have logged in!',
@@ -290,6 +232,10 @@ register route
     }
   });
 
+/*===================================================
+authentication header
+===================================================*/
+// any route needs authentication should come after this middleware 
   router.use((req, res, next)=>{
     const token = req.headers['authorization'];
     if(!token){
@@ -312,6 +258,9 @@ register route
     }
   });
 
+/*===================================================
+Check user's status(Email verifycation)
+===================================================*/ 
   router.get('/checkUserActivated',(req, res)=>{
     // res.send(req.decoded);
     User.findOne({_id: req.decoded.userId},(error, user)=>{
@@ -343,6 +292,9 @@ register route
     });
   });
 
+/*===================================================
+activate legitimate user
+===================================================*/ 
   router.post('/activateUser',(req, res)=>{
     // res.send(req.decoded);
     if(!req.body.activationCode){
@@ -380,6 +332,7 @@ register route
                     message: 'Please enter correct activation code.'
                   });
                 }else{
+   // activating users account 
                   User.update({_id: req.decoded.userId},{
                     activation: true
                   },(error)=>{
@@ -403,39 +356,43 @@ register route
     }
   });
 
-  // needs decoded token
-    router.get('/profile',(req, res) => {
-    //   test token first
-        // res.send(req.decoded);
-
-        User.findOne({ _id: req.decoded.userId }).select('username email activation').exec((error, user) =>{
-            if(error){
-                res.json({
-                    success: false,
-                    message: error
-                });
-            }else{
-                if(!user){
-                    res.json({
-                        success: false,
-                        message: 'No user found.'
-                    })
-                }else{
-                    res.json({
-                        success: true,
-                        user: user
-                    });
-                }
-            }
-        })
-    });
+/*===================================================
+profile
+===================================================*/
+  router.get('/profile',(req, res) => {
+ //   test token first
+    // res.send(req.decoded);
+    User.findOne({ _id: req.decoded.userId }).select('username email activation').exec((error, user) =>{
+      if(error){
+        res.json({
+          success: false,
+          message: error
+        });
+      }else{
+        if(!user){
+          res.json({
+              success: false,
+              message: 'No user found.'
+          })
+        }else{
+          res.json({
+              success: true,
+              user: user
+          });
+        }
+      }
+    })
+  });
 
 
   return router;
 }
 
 
-
+/*===================================================
+functions
+===================================================*/
+// generating random code 
 function generateRandomeCode() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -445,6 +402,7 @@ function generateRandomeCode() {
   return text;
 }
 
+// mailing random code to users email address
 function letsMail(recipentEmail,randomCode){
   let transporter = nodemailer.createTransport({
     service: 'gmail',

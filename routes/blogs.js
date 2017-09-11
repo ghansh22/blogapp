@@ -6,6 +6,9 @@ const config = require('../config/database');
 
 module.exports = (router) =>{
 
+/*===================================================
+newBLog creation
+===================================================*/  
   router.post('/newBlog',(req, res)=>{
     if(!req.body.title){
       res.json({
@@ -64,6 +67,9 @@ module.exports = (router) =>{
     }
   });
 
+/*===================================================
+getting all blogs
+===================================================*/  
   router.get('/allBlogs',(req, res)=>{
     Blog.find({},(error,blogs)=>{
       if(error){
@@ -87,59 +93,65 @@ module.exports = (router) =>{
     }).sort({'_id': -1});
   });
 
+/*===================================================
+getting single blog using id
+===================================================*/
   router.get('/singleBlog/:id', (req, res) =>{
     if(!req.params.id){
       res.json({
         success: false,
         message:'No blog id provided.'
       });
-   }else{
-    Blog.findOne({_id: req.params.id}, (error, blog)=>{
-      if(error){
-        res.json({
-          success: false,
-          message: 'not a valid blog id: '+error
-        });
-      }else{
-        if(!blog){
+    }else{
+      Blog.findOne({_id: req.params.id}, (error, blog)=>{
+        if(error){
           res.json({
             success: false,
-            message: 'no blog found.'
+            message: 'not a valid blog id: '+error
           });
         }else{
-          User.findOne({ _id: req.decoded.userId }, (error, user)=>{
-            if(error){
-              res.json({
-                success: false,
-                message: error
-              });
-            }else{
-              if(!user){
+          if(!blog){
+            res.json({
+              success: false,
+              message: 'no blog found.'
+            });
+          }else{
+            User.findOne({ _id: req.decoded.userId }, (error, user)=>{
+              if(error){
                 res.json({
                   success: false,
-                  message: 'Unable to authenticate the user'
+                  message: error
                 });
               }else{
-                if(user.username !== blog.createdBy){
+                if(!user){
                   res.json({
                     success: false,
-                    message: 'you are not autherized to edit this blog post'
+                    message: 'Unable to authenticate the user'
                   });
                 }else{
-                  res.json({
-                    success: true,
-                    blog: blog
-                  });
+                  if(user.username !== blog.createdBy){
+                    res.json({
+                      success: false,
+                      message: 'you are not autherized to edit this blog post'
+                    });
+                  }else{
+                    res.json({
+                      success: true,
+                      blog: blog
+                    });
+                  }
                 }
               }
-            }
-          });
+            });
+          }
         }
-      }
-    });
-  }
+      });
+    }
   });  
 
+/*===================================================
+updating an existing blog
+===================================================*/
   router.put('/updateBlog',(req, res)=>{
     if(!req.body._id){
       res.json({
@@ -225,6 +237,9 @@ module.exports = (router) =>{
     }
   });
 
+/*===================================================
+blog deletion
+===================================================*/
   router.delete('/deleteBlog/:id',(req,res)=>{
     if(!req.params.id){
       res.json({
@@ -287,6 +302,9 @@ module.exports = (router) =>{
     }
   });
 
+/*===================================================
+blog like route
+===================================================*/  
   router.put('/likeBlog',(req,res)=>{
     if(!req.body.id){
       res.json({
@@ -329,14 +347,14 @@ module.exports = (router) =>{
                     if(blog.likedBy.includes(user.username)){
                       res.json({
                         success: false,
-                        message: 'Ypu have already liked this post!'
+                        message: 'You have already liked this post!'
                       });
                     }else{
                       if(blog.dislikedBy.includes(user.username)){
                         blog.dislikes--;
                         const arrayIndex = blog.dislikedBy.indexOf(user.username);
                         blog.dislikedBy.splice(arrayIndex,1);
-                        blog.likedBy++;
+                        blog.likes++;
                         blog.likedBy.push(user.username);
                         blog.save((error)=>{
                           if(error){
@@ -352,7 +370,7 @@ module.exports = (router) =>{
                           }
                         });
                       }else{
-                        blog.likedBy++;
+                        blog.likes++;
                         blog.likedBy.push(user.username);
                         blog.save((error)=>{
                           if(error){
@@ -379,7 +397,9 @@ module.exports = (router) =>{
     }
   });
 
-
+/*===================================================
+blog dislike route
+===================================================*/
   router.put('/dislikeBlog',(req,res)=>{
     if(!req.body.id){
       res.json({
@@ -429,7 +449,7 @@ module.exports = (router) =>{
                         blog.likes--;
                         const arrayIndex = blog.likedBy.indexOf(user.username);
                         blog.likedBy.splice(arrayIndex,1);
-                        blog.dislikedBy++;
+                        blog.dislikes++;
                         blog.dislikedBy.push(user.username);
                         blog.save((error)=>{
                           if(error){
@@ -445,7 +465,7 @@ module.exports = (router) =>{
                           }
                         });
                       }else{
-                        blog.dislikedBy++;
+                        blog.dislikes++;
                         blog.dislikedBy.push(user.username);
                         blog.save((error)=>{
                           if(error){
@@ -471,8 +491,5 @@ module.exports = (router) =>{
       });        
     }
   });
-
-
-
   return router;
 };
