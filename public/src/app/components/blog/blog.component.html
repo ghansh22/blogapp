@@ -106,7 +106,7 @@
       <div *ngIf='username !== blog.createdBy'>
         <!--likes dropdown  -->
         <div class="dropdown">
-        <button type="button" name="button" class="btn btn-sm btn-success">
+        <button  [disabled]="blog.likedBy.includes(username)" type="button" name="button" class="btn btn-sm btn-success" (click)='likeBlog(blog._id)'>
           <span class="glyphicon glyphicon-thumbs-up">&nbsp;&nbsp;like: 21</span>
         </button>
         <div class="dropdown-content">
@@ -118,7 +118,7 @@
 
         <!--dislikes dropdown  -->
         <div class="dropdown">
-        <button type="button" name="button" class="btn btn-sm btn-danger">
+        <button [disabled]="blog.dislikedBy.includes(username)" type="button" name="button" class="btn btn-sm btn-danger" (click)='dislikeBlog(blog._id)'>
           <span class="glyphicon glyphicon-thumbs-down">&nbsp;&nbsp;disLike: 21</span>
         </button>
         <div class="dropdown-content">
