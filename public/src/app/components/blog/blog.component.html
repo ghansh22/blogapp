@@ -12,7 +12,7 @@
     <div class="form-group">
       <label for="title">Title</label>
       <div [ngClass]="{'has-error': form.controls.title.errors && form.controls.title.dirty, 'has-success': !form.controls.title.errors && form.controls.title.dirty}">
-        <input class="form-control" type="text" name="title" formControlName='title' placeholder="blog title">
+        <input class="form-control" type="text" name="title" formControlName='title' placeholder="blog title" autocomplete="off">
         <ul class="help-block">
           <li *ngIf='form.controls.title.errors?.required && form.controls.title.dirty'>Please enter title.</li>
           <li *ngIf='form.controls.title.errors?.minlength && form.controls.title.dirty'>Minimum 5 characters required.</li>
